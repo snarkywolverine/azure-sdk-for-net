@@ -6,8 +6,9 @@
 #nullable disable
 
 using System.Collections.Generic;
+using Azure.Core;
 
-namespace Azure.DigitalTwins.Core.Models
+namespace Azure.DigitalTwins.Core
 {
     /// <summary> A collection of ModelData objects. </summary>
     internal partial class PagedModelDataCollection
@@ -15,19 +16,20 @@ namespace Azure.DigitalTwins.Core.Models
         /// <summary> Initializes a new instance of PagedModelDataCollection. </summary>
         internal PagedModelDataCollection()
         {
+            Value = new ChangeTrackingList<DigitalTwinsModelData>();
         }
 
         /// <summary> Initializes a new instance of PagedModelDataCollection. </summary>
         /// <param name="value"> The ModelData objects. </param>
         /// <param name="nextLink"> A URI to retrieve the next page of objects. </param>
-        internal PagedModelDataCollection(IReadOnlyList<ModelData> value, string nextLink)
+        internal PagedModelDataCollection(IReadOnlyList<DigitalTwinsModelData> value, string nextLink)
         {
             Value = value;
             NextLink = nextLink;
         }
 
         /// <summary> The ModelData objects. </summary>
-        public IReadOnlyList<ModelData> Value { get; }
+        public IReadOnlyList<DigitalTwinsModelData> Value { get; }
         /// <summary> A URI to retrieve the next page of objects. </summary>
         public string NextLink { get; }
     }

@@ -5,6 +5,9 @@ parameters:
 - name: ServiceName
   type: string
   default: 'not-specified'
+- name: ServiceDirectory
+  type: string
+  default: ''
 - name: ForRelease
   type: boolean
   default: false
@@ -12,14 +15,12 @@ parameters:
 steps:
   - task: Powershell@2
     inputs:
-      filePath: /eng/common/scripts/Verify-ChangeLog.ps1
+      filePath: $(Build.SourcesDirectory)/eng/common/scripts/Verify-ChangeLog.ps1
       arguments: >
         -PackageName ${{ parameters.PackageName }}
-        -ServiceName ${{ parameters.ServiceName }}
-        -RepoRoot $(Build.SourcesDirectory)
-        -RepoName $(Build.Repository.Name)
-        -ForRelease ${{ parameters.ForRelease }}
+        -ServiceDirectory ${{ coalesce(parameters.ServiceDirectory, parameters.ServiceName) }}
+        -ForRelease $${{ parameters.ForRelease }}
       pwsh: true
       workingDirectory: $(Pipeline.Workspace)
-    displayName: Verify ChangeLog / Release Notes
+    displayName: Verify ChangeLogEntry for ${{ parameters.PackageName }}
     continueOnError: false

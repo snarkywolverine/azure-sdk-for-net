@@ -10,7 +10,6 @@ using System.Net;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Azure.DigitalTwins.Core.Models;
 using Azure.DigitalTwins.Core.Serialization;
 using static Azure.DigitalTwins.Core.Samples.SampleLogger;
 
@@ -172,8 +171,8 @@ namespace Azure.DigitalTwins.Core.Samples
 
                 #region Snippet:DigitalTwinsSampleGetModels
 
-                AsyncPageable<ModelData> allModels = client.GetModelsAsync();
-                await foreach (ModelData model in allModels)
+                AsyncPageable<DigitalTwinsModelData> allModels = client.GetModelsAsync();
+                await foreach (DigitalTwinsModelData model in allModels)
                 {
                     Console.WriteLine($"Retrieved model '{model.Id}', " +
                         $"display name '{model.DisplayName["en"]}', " +

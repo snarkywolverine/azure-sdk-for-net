@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.DigitalTwins.Core.Models;
 using Azure.DigitalTwins.Core.Serialization;
 
 namespace Azure.DigitalTwins.Core
@@ -17,7 +16,7 @@ namespace Azure.DigitalTwins.Core
     {
         // The modelUpdates parameter needs to be changed from IEnumerable<object> to IEnumerable<string>
         // and not parsed like a json object.
-        public async Task<Response<IReadOnlyList<ModelData>>> AddAsync(IEnumerable<string> models = null, CancellationToken cancellationToken = default)
+        public async Task<Response<IReadOnlyList<DigitalTwinsModelData>>> AddAsync(IEnumerable<string> models = null, CancellationToken cancellationToken = default)
         {
             using DiagnosticScope scope = _clientDiagnostics.CreateScope("DigitalTwinModelsClient.Add");
             scope.Start();
@@ -30,12 +29,12 @@ namespace Azure.DigitalTwins.Core
                     case 200:
                     case 201:
                         {
-                            IReadOnlyList<ModelData> value = default;
+                            IReadOnlyList<DigitalTwinsModelData> value = default;
                             using JsonDocument document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
-                            List<ModelData> array = new List<ModelData>(document.RootElement.GetArrayLength());
+                            List<DigitalTwinsModelData> array = new List<DigitalTwinsModelData>(document.RootElement.GetArrayLength());
                             foreach (JsonElement item in document.RootElement.EnumerateArray())
                             {
-                                array.Add(ModelData.DeserializeModelData(item));
+                                array.Add(DigitalTwinsModelData.DeserializeDigitalTwinsModelData(item));
                             }
                             value = array;
                             return Response.FromValue(value, message.Response);
@@ -53,7 +52,7 @@ namespace Azure.DigitalTwins.Core
 
         // The modelUpdates parameter needs to be changed from IEnumerable<object> to IEnumerable<string>
         // and not parsed like a json object.
-        internal Response<IReadOnlyList<ModelData>> Add(IEnumerable<string> models = null, CancellationToken cancellationToken = default)
+        internal Response<IReadOnlyList<DigitalTwinsModelData>> Add(IEnumerable<string> models = null, CancellationToken cancellationToken = default)
         {
             using DiagnosticScope scope = _clientDiagnostics.CreateScope("DigitalTwinModelsClient.Add");
             scope.Start();
@@ -66,12 +65,12 @@ namespace Azure.DigitalTwins.Core
                     case 200:
                     case 201:
                         {
-                            IReadOnlyList<ModelData> value = default;
+                            IReadOnlyList<DigitalTwinsModelData> value = default;
                             using var document = JsonDocument.Parse(message.Response.ContentStream);
-                            List<ModelData> array = new List<ModelData>(document.RootElement.GetArrayLength());
+                            List<DigitalTwinsModelData> array = new List<DigitalTwinsModelData>(document.RootElement.GetArrayLength());
                             foreach (JsonElement item in document.RootElement.EnumerateArray())
                             {
-                                array.Add(ModelData.DeserializeModelData(item));
+                                array.Add(DigitalTwinsModelData.DeserializeDigitalTwinsModelData(item));
                             }
                             value = array;
                             return Response.FromValue(value, message.Response);
@@ -164,6 +163,7 @@ namespace Azure.DigitalTwins.Core
             uri.AppendQuery("api-version", apiVersion, true);
             request.Uri = uri;
             request.Headers.Add("Content-Type", "application/json; charset=utf-8");
+            request.Headers.Add("Accept", "application/json");
             if (models != null)
             {
                 string modelsJsonArray = PayloadHelper.BuildArrayPayload(models);
@@ -186,6 +186,7 @@ namespace Azure.DigitalTwins.Core
             uri.AppendQuery("api-version", apiVersion, true);
             request.Uri = uri;
             request.Headers.Add("Content-Type", "application/json; charset=utf-8");
+            request.Headers.Add("Accept", "application/json");
             if (modelUpdates != null)
             {
                 string modelUpdatesArray = PayloadHelper.BuildArrayPayload(modelUpdates);
@@ -195,6 +196,7 @@ namespace Azure.DigitalTwins.Core
         }
 
         #region null overrides
+
         // The following methods are only declared so that autorest does not create these functions in the generated code.
         // For methods that we need to override, when the parameter list is the same, autorest knows not to generate them again.
         // When the parameter list changes, autorest generates the methods again.
@@ -206,7 +208,7 @@ namespace Azure.DigitalTwins.Core
         // Original return type is Task<Response<IReadOnlyList<ModelData>>>. Changing to object to allow returning null.
         private object AddAsync(IEnumerable<object> models = null, CancellationToken cancellationToken = default) => null;
 
-        private Response<IReadOnlyList<ModelData>> Add(IEnumerable<object> models = null, CancellationToken cancellationToken = default) => null;
+        private Response<IReadOnlyList<DigitalTwinsModelData>> Add(IEnumerable<object> models = null, CancellationToken cancellationToken = default) => null;
 
         // Original return type is ValueTask<Response>. Changing to object to allow returing null.
         private object UpdateAsync(string id, IEnumerable<object> updateModel, CancellationToken cancellationToken = default) => null;
@@ -216,6 +218,7 @@ namespace Azure.DigitalTwins.Core
         private HttpMessage CreateAddRequest(IEnumerable<object> models) => null;
 
 #pragma warning restore CA1801, IDE0051, IDE0060 // Remove unused parameter
-        #endregion
+
+        #endregion null overrides
     }
 }

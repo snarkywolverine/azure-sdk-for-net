@@ -45,7 +45,7 @@ namespace Azure.ResourceManager.AppConfiguration.Tests
             Label = "test_label1_" + LabelUuId;
             TestContentType = "test content type";
             TestValue = "test value";
-            ResourceGroupPrefix = "Default-EventHub-";
+            ResourceGroupPrefix = "Default-AppConfiguration-";
             AppConfigurationManagementClient = GetAppConfigurationManagementClient();
             ConfigurationStoresOperations = AppConfigurationManagementClient.ConfigurationStores;
             PrivateEndpointConnectionsOperations = AppConfigurationManagementClient.PrivateEndpointConnections;
@@ -63,13 +63,13 @@ namespace Azure.ResourceManager.AppConfiguration.Tests
         {
             return CreateClient<AppConfigurationManagementClient>(this.TestEnvironment.SubscriptionId,
                 TestEnvironment.Credential,
-                Recording.InstrumentClientOptions(new AppConfigurationManagementClientOptions()));
+                InstrumentClientOptions(new AppConfigurationManagementClientOptions()));
         }
         internal NetworkManagementClient GetNetworkManagementClient()
         {
             return CreateClient<NetworkManagementClient>(this.TestEnvironment.SubscriptionId,
                 TestEnvironment.Credential,
-                Recording.InstrumentClientOptions(new NetworkManagementClientOptions()));
+                InstrumentClientOptions(new NetworkManagementClientOptions()));
         }
     }
 }

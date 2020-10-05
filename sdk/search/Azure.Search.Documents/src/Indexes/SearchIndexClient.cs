@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Core.Pipeline;
+using Azure.Core.Serialization;
 using Azure.Search.Documents.Indexes.Models;
 
 namespace Azure.Search.Documents.Indexes
@@ -20,11 +21,9 @@ namespace Azure.Search.Documents.Indexes
         private readonly HttpPipeline _pipeline;
         private readonly ClientDiagnostics _clientDiagnostics;
         private readonly SearchClientOptions.ServiceVersion _version;
-#if EXPERIMENTAL_SERIALIZER
         private readonly ObjectSerializer _serializer;
-#endif
 
-        private ServiceRestClient _serviceClient;
+        private SearchServiceRestClient _serviceClient;
         private IndexesRestClient _indexesClient;
         private SynonymMapsRestClient _synonymMapsClient;
         private string _serviceName;
@@ -41,7 +40,7 @@ namespace Azure.Search.Documents.Indexes
         /// <param name="credential">
         /// Required. The API key credential used to authenticate requests against the Search service.
         /// You need to use an admin key to perform any operations on the SearchIndexClient.
-        /// See <see href="https://docs.microsoft.com/azure/search/search-security-api-keys"/> for more information about API keys in Azure Cognitive Search.
+        /// See <see href="https://docs.microsoft.com/azure/search/search-security-api-keys">Create and manage api-keys for an Azure Cognitive Search service</see> for more information about API keys in Azure Cognitive Search.
         /// </param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="endpoint"/> or <paramref name="credential"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="endpoint"/> is not using HTTPS.</exception>
@@ -57,7 +56,7 @@ namespace Azure.Search.Documents.Indexes
         /// <param name="credential">
         /// Required. The API key credential used to authenticate requests against the Search service.
         /// You need to use an admin key to perform any operations on the SearchIndexClient.
-        /// See <see href="https://docs.microsoft.com/azure/search/search-security-api-keys"/> for more information about API keys in Azure Cognitive Search.
+        /// See <see href="https://docs.microsoft.com/azure/search/search-security-api-keys">Create and manage api-keys for an Azure Cognitive Search service</see> for more information about API keys in Azure Cognitive Search.
         /// </param>
         /// <param name="options">Client configuration options for connecting to Azure Cognitive Search.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="endpoint"/> or <paramref name="credential"/> is null.</exception>
@@ -73,9 +72,7 @@ namespace Azure.Search.Documents.Indexes
 
             options ??= new SearchClientOptions();
             Endpoint = endpoint;
-#if EXPERIMENTAL_SERIALIZER
             _serializer = options.Serializer;
-#endif
             _clientDiagnostics = new ClientDiagnostics(options);
             _pipeline = options.Build(credential);
             _version = options.Version;
@@ -94,9 +91,9 @@ namespace Azure.Search.Documents.Indexes
             _serviceName ??= Endpoint.GetSearchServiceName();
 
         /// <summary>
-        /// Gets the generated <see cref="ServiceRestClient"/> to make requests.
+        /// Gets the generated <see cref="SearchServiceRestClient"/> to make requests.
         /// </summary>
-        private ServiceRestClient ServiceClient => LazyInitializer.EnsureInitialized(ref _serviceClient, () => new ServiceRestClient(
+        private SearchServiceRestClient ServiceClient => LazyInitializer.EnsureInitialized(ref _serviceClient, () => new SearchServiceRestClient(
             _clientDiagnostics,
             _pipeline,
             Endpoint.ToString(),
@@ -143,9 +140,7 @@ namespace Azure.Search.Documents.Indexes
             return new SearchClient(
                 Endpoint,
                 indexName,
-#if EXPERIMENTAL_SERIALIZER
                 _serializer,
-#endif
                 _pipeline,
                 _clientDiagnostics,
                 _version);
